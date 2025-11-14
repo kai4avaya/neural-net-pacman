@@ -6,6 +6,7 @@ import { drawArchitectureBackground, drawConnections, drawNeurons, drawPowerups,
 import GameHeader from './GameHeader';
 import GameStats from './GameStats';
 import GameOverlay from './GameOverlay';
+import CheatMenu from './CheatMenu';
 
 const NeuralPacman = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,6 +15,7 @@ const NeuralPacman = () => {
   const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [cheatMenuOpen, setCheatMenuOpen] = useState(false);
   
   const gameState = useRef<GameState>({
     player: { x: 250, y: 250, vx: 0, vy: 0, speed: 2 },
@@ -95,7 +97,15 @@ const NeuralPacman = () => {
   }, []);
 
   useEffect(() => {
-    const kd = (e: KeyboardEvent) => { if (!gameOver && !gameWon) gameState.current.keys[e.key] = true; };
+    const kd = (e: KeyboardEvent) => { 
+      // Cheat menu toggle (Ctrl+L)
+      if (e.ctrlKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        setCheatMenuOpen(prev => !prev);
+        return;
+      }
+      if (!gameOver && !gameWon) gameState.current.keys[e.key] = true; 
+    };
     const ku = (e: KeyboardEvent) => { gameState.current.keys[e.key] = false; };
     window.addEventListener('keydown', kd);
     window.addEventListener('keyup', ku);
@@ -129,6 +139,13 @@ const NeuralPacman = () => {
     gameState.current.boostEffects = {};
   };
 
+  const handleSelectLevel = (newLevel: number) => {
+    setLevel(newLevel);
+    setGameWon(false);
+    setGameOver(false);
+    gameState.current.boostEffects = {};
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
       <GameHeader arch={arch} />
@@ -147,6 +164,13 @@ const NeuralPacman = () => {
       </div>
 
       <p className="mt-4 text-center text-gray-600 text-sm">WASD/Arrows to move • Collect powerups • Activate all neurons</p>
+      
+      <CheatMenu 
+        isOpen={cheatMenuOpen}
+        onClose={() => setCheatMenuOpen(false)}
+        onSelectLevel={handleSelectLevel}
+        currentLevel={level}
+      />
     </div>
   );
 };

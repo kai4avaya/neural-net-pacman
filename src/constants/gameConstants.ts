@@ -7,7 +7,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 1958, 
     name: 'Perceptron', 
-    desc: 'Single layer', 
+    desc: 'Single layer',
+    explanation: 'The first artificial neuron that learns by adjusting weights to classify linearly separable patterns.',
     layers: [{ count: 8, x: 200 }, { count: 1, x: 500 }], 
     density: 1.0, 
     errors: 1,
@@ -21,7 +22,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 1986, 
     name: 'MLP', 
-    desc: 'Backpropagation', 
+    desc: 'Backpropagation',
+    explanation: 'Multi-layer networks that learn complex patterns by propagating errors backward through hidden layers.',
     layers: [{ count: 6, x: 150 }, { count: 8, x: 350 }, { count: 4, x: 550 }], 
     density: 0.8, 
     errors: 2,
@@ -35,7 +37,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 1989, 
     name: 'CNN', 
-    desc: 'Convolution', 
+    desc: 'Convolution',
+    explanation: 'Uses overlapping square filters (kernels) to detect spatial patterns like edges and shapes in images.',
     layers: [{ count: 9, x: 100 }, { count: 6, x: 240 }, { count: 4, x: 380 }, { count: 6, x: 520 }, { count: 3, x: 640 }], 
     density: 0.5, 
     errors: 2,
@@ -49,7 +52,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 1997, 
     name: 'LSTM', 
-    desc: 'Recurrent', 
+    desc: 'Recurrent',
+    explanation: 'Long Short-Term Memory networks use gates to selectively remember or forget information over time sequences.',
     layers: [{ count: 5, x: 200 }, { count: 6, x: 350 }, { count: 5, x: 500 }], 
     density: 0.9, 
     recurrent: true, 
@@ -64,7 +68,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 2012, 
     name: 'AlexNet', 
-    desc: 'Deep CNN', 
+    desc: 'Deep CNN',
+    explanation: 'A deep convolutional network that revolutionized image recognition by stacking multiple convolutional and pooling layers.',
     layers: [{ count: 11, x: 100 }, { count: 9, x: 200 }, { count: 7, x: 300 }, { count: 5, x: 400 }, { count: 7, x: 500 }, { count: 4, x: 600 }], 
     density: 0.6, 
     errors: 3,
@@ -78,7 +83,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 2014, 
     name: 'GAN', 
-    desc: 'Adversarial', 
+    desc: 'Adversarial',
+    explanation: 'Generative Adversarial Networks pit a generator against a discriminator in a competitive game to create realistic synthetic data.',
     layers: [{ count: 4, x: 150 }, { count: 6, x: 300 }, { count: 8, x: 450 }, { count: 5, x: 600 }], 
     density: 0.7, 
     errors: 4,
@@ -92,7 +98,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 2015, 
     name: 'ResNet', 
-    desc: 'Skip connections', 
+    desc: 'Skip connections',
+    explanation: 'Residual Networks use skip connections to allow gradients to flow directly through layers, enabling training of very deep networks.',
     layers: [{ count: 8, x: 100 }, { count: 8, x: 200 }, { count: 8, x: 300 }, { count: 8, x: 400 }, { count: 8, x: 500 }, { count: 6, x: 600 }], 
     density: 0.6, 
     skip: true, 
@@ -107,7 +114,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 2017, 
     name: 'Transformer', 
-    desc: 'Attention', 
+    desc: 'Attention',
+    explanation: 'Uses self-attention mechanisms to process sequences in parallel, allowing models to focus on relevant parts of the input simultaneously.',
     layers: [{ count: 8, x: 150 }, { count: 10, x: 300 }, { count: 10, x: 450 }, { count: 6, x: 600 }], 
     density: 0.9, 
     attention: true, 
@@ -122,7 +130,8 @@ export const neuralNetHistory: NeuralNetArchitecture[] = [
   { 
     year: 2020, 
     name: 'GPT-3', 
-    desc: '175B params', 
+    desc: '175B params',
+    explanation: 'A massive transformer-based language model that generates human-like text by predicting the next word using attention over billions of parameters.',
     layers: [{ count: 12, x: 100 }, { count: 14, x: 200 }, { count: 16, x: 300 }, { count: 14, x: 400 }, { count: 12, x: 500 }, { count: 8, x: 600 }], 
     density: 0.85, 
     attention: true, 

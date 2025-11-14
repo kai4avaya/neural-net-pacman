@@ -5,6 +5,11 @@ export interface Neuron {
   idx: number;
   r: number;
   phase: number;
+  gridX?: number; // For CNN grid layouts
+  gridY?: number; // For CNN grid layouts
+  headIdx?: number; // For Transformer attention heads
+  isEncoder?: boolean; // For Transformer encoder/decoder
+  isDecoder?: boolean;
 }
 
 export interface Connection {
@@ -83,6 +88,7 @@ export interface NeuralNetArchitecture {
   year: number;
   name: string;
   desc: string;
+  explanation?: string; // One sentence explanation of the model
   layers: Array<{ count: number; x: number }>;
   density: number;
   errors: number;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Flame, Brain } from 'lucide-react';
 import { NeuralNetArchitecture } from '../types/gameTypes';
 
 interface GameHeaderProps {
@@ -8,14 +7,30 @@ interface GameHeaderProps {
 
 const GameHeader: React.FC<GameHeaderProps> = ({ arch }) => {
   return (
-    <div className="mb-4 text-center">
-      <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
-        <Flame className="w-8 h-8 text-orange-500" />
+    <div className="mb-4">
+      <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
         Neural Net History
-        <Brain className="w-8 h-8 text-gray-700" />
       </h1>
-      <p className="text-gray-600 text-lg font-semibold">{arch.year} - {arch.name}</p>
-      <p className="text-gray-500 text-sm">{arch.desc}</p>
+      <table className="border-collapse border border-gray-800 font-mono text-sm mx-auto max-w-3xl">
+        <tbody>
+          <tr>
+            <td className="border border-gray-800 px-4 py-2 text-right font-bold bg-gray-100" style={{ width: '80px' }}>
+              {arch.year}
+            </td>
+            <td className="border border-gray-800 px-4 py-2 font-bold bg-gray-50" colSpan={2}>
+              {arch.name}
+            </td>
+          </tr>
+          {arch.explanation && (
+            <tr>
+              <td className="border border-gray-800"></td>
+              <td className="border border-gray-800 px-4 py-2 text-gray-700 bg-white" colSpan={2}>
+                {arch.explanation}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
