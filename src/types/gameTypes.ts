@@ -89,4 +89,6 @@ export interface NeuralNetArchitecture {
   recurrent?: boolean;
   skip?: boolean;
   attention?: boolean;
+  visualStyle?: 'perceptron' | 'mlp' | 'cnn' | 'lstm' | 'alexnet' | 'gan' | 'resnet' | 'transformer' | 'gpt3';
+  powerups?: Array<{ label: string; effect: 'speed' | 'points' | 'invincible' | 'double' | 'slow'; msg: string; dur?: number; val?: number }>;
 }

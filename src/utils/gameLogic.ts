@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameState, Neuron, Connection, NeuralNetArchitecture, Powerup } from '../types/gameTypes';
-import { HEIGHT, ERROR_POSITIONS, powerups } from '../constants/gameConstants';
+import { HEIGHT, ERROR_POSITIONS } from '../constants/gameConstants';
 
 export function initializeNeuralNetwork(arch: NeuralNetArchitecture): { neurons: Neuron[]; connections: Connection[] } {
   const neurons: Neuron[] = [];
@@ -87,8 +87,12 @@ export function initializeErrors(errorCount: number) {
 
 export function schedulePowerups(
   gameState: React.MutableRefObject<GameState>,
-  _setScore: React.Dispatch<React.SetStateAction<number>>
+  _setScore: React.Dispatch<React.SetStateAction<number>>,
+  arch: NeuralNetArchitecture
 ) {
+  const availablePowerups = arch.powerups || [];
+  if (availablePowerups.length === 0) return;
+  
   for (let i = 0; i < 3; i++) {
     setTimeout(() => {
       const avail = gameState.current.neurons.filter(n => {
@@ -97,10 +101,10 @@ export function schedulePowerups(
       });
       if (avail.length > 0) {
         const rn = avail[Math.floor(Math.random() * avail.length)];
-        const basePowerup = powerups[Math.floor(Math.random() * powerups.length)];
+        const basePowerup = availablePowerups[Math.floor(Math.random() * availablePowerups.length)];
         const pu: Powerup = {
           label: basePowerup.label,
-          effect: basePowerup.effect as Powerup['effect'],
+          effect: basePowerup.effect,
           msg: basePowerup.msg,
           dur: basePowerup.dur,
           val: basePowerup.val,

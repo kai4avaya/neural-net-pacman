@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { GameState } from '../types/gameTypes';
 import { WIDTH, HEIGHT, neuralNetHistory } from '../constants/gameConstants';
 import { initializeNeuralNetwork, initializeErrors, schedulePowerups, updatePlayerMovement, checkNeuronActivation, checkPowerupCollection, updateErrorMovement } from '../utils/gameLogic';
-import { drawConnections, drawNeurons, drawPowerups, drawParticleTrail, drawPlayer, drawErrors, drawPopups } from '../utils/renderUtils';
+import { drawArchitectureBackground, drawConnections, drawNeurons, drawPowerups, drawParticleTrail, drawPlayer, drawErrors, drawPopups } from '../utils/renderUtils';
 import GameHeader from './GameHeader';
 import GameStats from './GameStats';
 import GameOverlay from './GameOverlay';
@@ -39,7 +39,7 @@ const NeuralPacman = () => {
     gameState.current.errors = initializeErrors(arch.errors);
     gameState.current.powerups = [];
     
-    schedulePowerups(gameState, setScore);
+    schedulePowerups(gameState, setScore, arch);
   }, [level]);
 
   useEffect(() => {
@@ -50,14 +50,16 @@ const NeuralPacman = () => {
     
     let aid: number;
     let t = 0;
-
+    
     const draw = () => {
+      const arch = neuralNetHistory[Math.min(level - 1, neuralNetHistory.length - 1)];
       t += 0.01;
       ctx.fillStyle = '#fafafa';
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      drawConnections(ctx, gameState.current.connections, gameState.current.activatedNeurons);
-      drawNeurons(ctx, gameState.current.neurons, gameState.current.activatedNeurons, t);
+      drawArchitectureBackground(ctx, arch, t);
+      drawConnections(ctx, gameState.current.connections, gameState.current.activatedNeurons, arch);
+      drawNeurons(ctx, gameState.current.neurons, gameState.current.activatedNeurons, t, arch);
       drawPowerups(ctx, gameState.current.powerups, t);
       
       // Update and draw particle trail

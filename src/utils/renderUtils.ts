@@ -1,7 +1,99 @@
-import { GameState, Connection, Neuron, Error } from '../types/gameTypes';
-import { ERROR_SHADES } from '../constants/gameConstants';
+import { GameState, Connection, Neuron, Error, NeuralNetArchitecture } from '../types/gameTypes';
+import { ERROR_SHADES, WIDTH, HEIGHT } from '../constants/gameConstants';
 
-export function drawConnections(ctx: CanvasRenderingContext2D, connections: Connection[], activatedNeurons: Set<string>) {
+export function drawArchitectureBackground(ctx: CanvasRenderingContext2D, arch: NeuralNetArchitecture, t: number) {
+  const style = arch.visualStyle || 'mlp';
+  
+  switch (style) {
+    case 'cnn':
+    case 'alexnet':
+      // Draw grid pattern for CNN layers
+      ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < WIDTH; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, HEIGHT);
+        ctx.stroke();
+      }
+      for (let y = 0; y < HEIGHT; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(WIDTH, y);
+        ctx.stroke();
+      }
+      // Draw convolution kernels
+      arch.layers.forEach((layer, idx) => {
+        if (idx < arch.layers.length - 1) {
+          const x = (layer.x + arch.layers[idx + 1].x) / 2;
+          ctx.fillStyle = `rgba(59, 130, 246, ${0.1 + Math.sin(t + idx) * 0.05})`;
+          ctx.fillRect(x - 15, 50, 30, 30);
+        }
+      });
+      break;
+      
+    case 'transformer':
+    case 'gpt3':
+      // Draw attention patterns
+      ctx.strokeStyle = 'rgba(147, 51, 234, 0.15)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const angle = (t * 0.5 + i) * Math.PI / 4;
+        const cx = WIDTH / 2;
+        const cy = HEIGHT / 2;
+        const r = 150 + Math.sin(t * 2 + i) * 20;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r, 20, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      break;
+      
+    case 'lstm':
+      // Draw recurrent flow patterns
+      ctx.strokeStyle = 'rgba(34, 197, 94, 0.1)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 5; i++) {
+        const y = HEIGHT / 5 * (i + 1);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.quadraticCurveTo(WIDTH / 2, y + Math.sin(t + i) * 30, WIDTH, y);
+        ctx.stroke();
+      }
+      break;
+      
+    case 'resnet':
+      // Draw skip connection indicators
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.1)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 5]);
+      for (let i = 0; i < arch.layers.length - 2; i++) {
+        const x1 = arch.layers[i].x;
+        const x2 = arch.layers[i + 2].x;
+        ctx.beginPath();
+        ctx.moveTo(x1, HEIGHT / 2);
+        ctx.lineTo(x2, HEIGHT / 2);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      break;
+      
+    case 'gan':
+      // Draw adversarial pattern (alternating)
+      ctx.fillStyle = 'rgba(168, 85, 247, 0.05)';
+      for (let i = 0; i < WIDTH; i += 40) {
+        if (Math.floor(i / 40) % 2 === 0) {
+          ctx.fillRect(i, 0, 40, HEIGHT);
+        }
+      }
+      break;
+      
+    default:
+      // Simple background for perceptron/MLP
+      break;
+  }
+}
+
+export function drawConnections(ctx: CanvasRenderingContext2D, connections: Connection[], activatedNeurons: Set<string>, _arch?: NeuralNetArchitecture) {
   connections.forEach(c => {
     const fk = `${Math.round(c.from.x)},${Math.round(c.from.y)}`;
     const tk = `${Math.round(c.to.x)},${Math.round(c.to.y)}`;
@@ -31,29 +123,96 @@ export function drawConnections(ctx: CanvasRenderingContext2D, connections: Conn
   });
 }
 
-export function drawNeurons(ctx: CanvasRenderingContext2D, neurons: Neuron[], activatedNeurons: Set<string>, t: number) {
+export function drawNeurons(ctx: CanvasRenderingContext2D, neurons: Neuron[], activatedNeurons: Set<string>, t: number, arch?: NeuralNetArchitecture) {
+  const style = arch?.visualStyle || 'mlp';
+  
   neurons.forEach(n => {
     const k = `${Math.round(n.x)},${Math.round(n.y)}`;
     const act = activatedNeurons.has(k);
     const p = Math.sin(t * 2 + n.phase) * 0.15 + 1;
+    
     if (act) {
       ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r * 0.6 * p, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+    } else {
+      ctx.strokeStyle = '#d1d5db';
+      ctx.fillStyle = '#fff';
+      ctx.lineWidth = 2;
+    }
+    
+    ctx.save();
+    
+    switch (style) {
+      case 'cnn':
+      case 'alexnet':
+        // Square neurons for CNN (like feature maps)
+        ctx.translate(n.x, n.y);
+        ctx.rotate(n.phase);
+        ctx.fillRect(-n.r * 0.4 * p, -n.r * 0.4 * p, n.r * 0.8 * p, n.r * 0.8 * p);
+        ctx.strokeRect(-n.r * 0.5, -n.r * 0.5, n.r, n.r);
+        break;
+        
+      case 'transformer':
+      case 'gpt3':
+        // Hexagon for attention
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i;
+          const x = Math.cos(angle) * n.r * 0.5 * p;
+          const y = Math.sin(angle) * n.r * 0.5 * p;
+          if (i === 0) ctx.moveTo(n.x + x, n.y + y);
+          else ctx.lineTo(n.x + x, n.y + y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        break;
+        
+      case 'lstm':
+        // Diamond shape for LSTM gates
+        ctx.beginPath();
+        ctx.moveTo(n.x, n.y - n.r * 0.5 * p);
+        ctx.lineTo(n.x + n.r * 0.5 * p, n.y);
+        ctx.lineTo(n.x, n.y + n.r * 0.5 * p);
+        ctx.lineTo(n.x - n.r * 0.5 * p, n.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        break;
+        
+      case 'resnet':
+        // Octagon for ResNet
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const angle = (Math.PI / 4) * i;
+          const x = Math.cos(angle) * n.r * 0.5 * p;
+          const y = Math.sin(angle) * n.r * 0.5 * p;
+          if (i === 0) ctx.moveTo(n.x + x, n.y + y);
+          else ctx.lineTo(n.x + x, n.y + y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        break;
+        
+      default:
+        // Circle for perceptron/MLP
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 0.5 * p, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    }
+    
+    ctx.restore();
+    
+    // Draw activation ring
+    if (act) {
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(n.x, n.y, n.r * 0.8, 0, Math.PI * 2);
       ctx.stroke();
-    } else {
-      ctx.strokeStyle = '#d1d5db';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r * 0.5, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = '#fff';
-      ctx.fill();
     }
   });
 }
