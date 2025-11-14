@@ -448,8 +448,8 @@ export function checkNeuronActivation(
   s.neurons.forEach(n => {
     const k = getNeuronKey(n);
     const d = Math.sqrt((s.player.x - n.x) ** 2 + (s.player.y - n.y) ** 2);
-    // Use a slightly larger collision radius for easier activation
-    const collisionRadius = n.r + 5;
+    // Use a larger collision radius for easier activation (especially for squares)
+    const collisionRadius = n.r + 10;
     if (d < collisionRadius && !s.activatedNeurons.has(k)) {
       s.activatedNeurons.add(k);
       setScore(sc => sc + (s.boostEffects.dbl ? 20 : 10));
@@ -457,11 +457,17 @@ export function checkNeuronActivation(
   });
   
   // Check for win condition after all neurons are checked
-  // Ensure we have all unique neurons activated
   const totalNeurons = s.neurons.length;
   const activatedCount = s.activatedNeurons.size;
   
-  if (totalNeurons > 0 && activatedCount >= totalNeurons) {
+  // Debug logging for CNN level
+  if (totalNeurons > 0 && (activatedCount === totalNeurons || activatedCount === totalNeurons - 1)) {
+    console.log(`Activation check: ${activatedCount}/${totalNeurons} neurons activated`);
+  }
+  
+  // Check win condition - use strict equality
+  if (totalNeurons > 0 && activatedCount === totalNeurons) {
+    console.log('All neurons activated! Game won!');
     setGameWon(true);
   }
 }

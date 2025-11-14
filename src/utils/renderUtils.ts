@@ -225,6 +225,14 @@ function getNeuronKey(n: Neuron): string {
 export function drawNeurons(ctx: CanvasRenderingContext2D, neurons: Neuron[], activatedNeurons: Set<string>, t: number, arch?: NeuralNetArchitecture) {
   const style = arch?.visualStyle || 'mlp';
   
+  // Debug: Check if CNN style is being used
+  if (style === 'cnn' && neurons.length > 0) {
+    // Log once per frame (throttled)
+    if (Math.random() < 0.001) {
+      console.log('CNN rendering:', { style, archName: arch?.name, neuronCount: neurons.length, firstNeuron: neurons[0] });
+    }
+  }
+  
   neurons.forEach(n => {
     const k = getNeuronKey(n);
     const act = activatedNeurons.has(k);
@@ -236,33 +244,46 @@ export function drawNeurons(ctx: CanvasRenderingContext2D, neurons: Neuron[], ac
       case 'cnn':
       case 'alexnet':
         // Square neurons arranged in grid (feature maps) - STACKED SQUARES
-        const squareSize = n.r * 1.2 * p;
-        const squareOffset = 4;
+        // Make squares VERY visible - larger size, solid colors
+        const squareSize = Math.max(n.r * 2.0, 22); // At least 22px or 2x radius - LARGE
+        const squareOffset = 6;
         
         // Draw stacked squares effect (like feature map layers) - draw from back to front
         for (let i = 2; i >= 0; i--) {
           const offsetX = (i - 1) * squareOffset;
           const offsetY = (i - 1) * squareOffset;
-          const alpha = i === 1 ? 1.0 : (i === 0 ? 0.5 : 0.3);
           
+          // Set SOLID colors - no transparency, very visible
           if (act) {
-            ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2.5;
+            ctx.fillStyle = '#000000';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
           } else {
-            ctx.fillStyle = `rgba(59, 130, 246, ${alpha * 0.4})`;
-            ctx.strokeStyle = '#2563eb';
-            ctx.lineWidth = 2;
+            // Bright, solid blue squares - impossible to miss
+            if (i === 1) {
+              ctx.fillStyle = '#2563eb'; // Bright blue (middle)
+            } else if (i === 0) {
+              ctx.fillStyle = '#3b82f6'; // Medium blue (front)
+            } else {
+              ctx.fillStyle = '#60a5fa'; // Light blue (back)
+            }
+            ctx.strokeStyle = '#1e40af'; // Dark blue border
+            ctx.lineWidth = 3;
           }
           
-          ctx.fillRect(n.x - squareSize/2 + offsetX, n.y - squareSize/2 + offsetY, squareSize, squareSize);
-          ctx.strokeRect(n.x - squareSize/2 + offsetX, n.y - squareSize/2 + offsetY, squareSize, squareSize);
+          // Draw filled square with border - DEFINITELY a square, not a circle
+          const x = n.x - squareSize/2 + offsetX;
+          const y = n.y - squareSize/2 + offsetY;
+          ctx.fillRect(x, y, squareSize, squareSize);
+          ctx.strokeRect(x, y, squareSize, squareSize);
         }
         
         // Draw grid position indicator
         if (n.gridX !== undefined && n.gridY !== undefined) {
-          ctx.fillStyle = act ? '#fff' : '#1e40af';
-          ctx.font = 'bold 9px monospace';
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 1;
+          ctx.font = 'bold 11px monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(`${n.gridX},${n.gridY}`, n.x, n.y);
@@ -334,15 +355,22 @@ export function drawNeurons(ctx: CanvasRenderingContext2D, neurons: Neuron[], ac
         ctx.stroke();
     }
     
-    ctx.restore();
-    
-    // Draw activation ring (skip for CNN/AlexNet as they use squares)
-    if (act && style !== 'cnn' && style !== 'alexnet') {
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r * 0.8, 0, Math.PI * 2);
-      ctx.stroke();
+    // IMPORTANT: Only restore context AFTER the switch statement completes
+    // For CNN/AlexNet, we've already drawn squares, so skip the default circle drawing
+    if (style !== 'cnn' && style !== 'alexnet') {
+      ctx.restore();
+      
+      // Draw activation ring (skip for CNN/AlexNet as they use squares)
+      if (act) {
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 0.8, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else {
+      // For CNN/AlexNet, restore after drawing squares
+      ctx.restore();
     }
   });
 }
